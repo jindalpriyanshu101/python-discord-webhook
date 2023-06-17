@@ -1,10 +1,10 @@
-# python-discord-webhook
+# Python Discord webhook
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/lovvskillz/python-discord-webhook/master/LICENSE)
 [![PyPI version](https://badge.fury.io/py/discord-webhook.svg)](https://badge.fury.io/py/discord-webhook)
 [![Downloads](https://pepy.tech/badge/discord-webhook)](https://pepy.tech/project/discord-webhook)
 
-Execute Discord Webhooks (also has [async support](#async-support))
+Easily send Discord webhooks with Python (also has [async support](#async-support))
 
 ## Install
 
@@ -16,8 +16,9 @@ pip install discord-webhook
 ## Examples
 
 * [Basic Webhook](#basic-webhook)
+* [Create Multiple Instances / Use multiple URLs](#create-multiple-instances)
+* [Get Webhook by ID](#get-webhook-by-id)
 * [Manage Being Rate Limited](#manage-being-rate-limited)
-* [Multiple Webhook Urls](#multiple-webhook-urls)
 * [Embedded Content](#webhook-with-embedded-content)
 * [Edit Webhook Message](#edit-webhook-messages)
 * [Delete Webhook Message](#delete-webhook-messages)
@@ -37,6 +38,30 @@ webhook = DiscordWebhook(url='your webhook url', content='Webhook Message')
 response = webhook.execute()
 ```
 
+### Create multiple instances
+If you want to use multiple URLs you need to create multiple instances.
+
+```python
+from discord_webhook import DiscordWebhook
+
+# you can provide any kwargs except url
+webhook1, webhook2 = DiscordWebhook.create_batch(urls=['first url', 'second url'], content='Webhook Message')
+response1 = webhook1.execute()
+response2 = webhook2.execute()
+```
+![Image](img/multiple_urls.png "Multiple Urls Result")
+
+### Get Webhook by ID
+You can access a webhook that has already been sent by providing the ID.
+
+````python
+from discord_webhook import DiscordWebhook
+
+webhook = DiscordWebhook(url='your webhook url', id='your webhook message id')
+# now you could delete or edit the webhook
+# ...
+````
+
 ### Manage being Rate Limited
 
 ```python
@@ -51,18 +76,6 @@ response = webhook.execute()
 ```
 
 ![Image](img/basic_webhook.png "Basic Example Result")
-
-### Multiple Webhook URLs
-
-```python
-from discord_webhook import DiscordWebhook
-
-webhook_urls = ['webhook url 1', 'webhook url 2']
-webhook = DiscordWebhook(url=webhook_urls, content='Webhook Message')
-response = webhook.execute()
-```
-
-![Image](img/multiple_urls.png "Multiple Urls Result")
 
 ### Webhook with Embedded Content
 
@@ -103,7 +116,7 @@ embed.set_thumbnail(url='your thumbnail url')
 # set footer
 embed.set_footer(text='Embed Footer Text', icon_url='URL of icon')
 
-# set timestamp (default is now)
+# set timestamp (default is now) accepted types are int, float and datetime
 embed.set_timestamp()
 
 # add fields to embed
@@ -140,7 +153,7 @@ response = webhook.execute()
 
 ![Image](img/extended_embed2.png "Example Embed Result")
 
-By Default, The Embed fields are placed side by side. We can arrange them in a new line by setting `inline=False` as follows:
+By Default, the Embed fields are placed side by side. We can arrange them in a new line by setting `inline=False` as follows:
 
 ```python
 from discord_webhook import DiscordWebhook, DiscordEmbed
@@ -176,10 +189,10 @@ from discord_webhook import DiscordWebhook
 from time import sleep
 
 webhook = DiscordWebhook(url='your webhook url', content='Webhook content before edit')
-sent_webhook = webhook.execute()
+webhook.execute()
 webhook.content = 'After Edit'
 sleep(10)
-sent_webhook = webhook.edit(sent_webhook)
+webhook.edit()
 ```
 
 ### Delete Webhook Messages
@@ -189,9 +202,9 @@ from discord_webhook import DiscordWebhook
 from time import sleep
 
 webhook = DiscordWebhook(url='your webhook url', content='Webhook Content')
-sent_webhook = webhook.execute()
+webhook.execute()
 sleep(10)
-webhook.delete(sent_webhook)
+webhook.delete()
 ```
 
 ### Send Files
@@ -243,9 +256,9 @@ embed = DiscordEmbed(title='Embed Title', description='Your Embed Description', 
 embed.set_thumbnail(url='attachment://example.jpg')
 
 webhook.add_embed(embed)
-response = webhook.execute(remove_embeds=True, remove_files=True)
-# webhook.files and webhook.embeds will be empty after webhook is executed
-# You could also manually call the functions webhook.remove_files() and webhook.remove_embeds()
+response = webhook.execute(remove_embeds=True)
+# webhook.embeds will be empty after webhook is executed
+# You could also manually call the function webhook.remove_embeds()
 ```
 
 `.remove_file()` removes the given file
@@ -309,25 +322,6 @@ webhook.set_proxies(proxies)
 response = webhook.execute()
 ```
 
-### Use CLI
-
-```
-usage: discord_webhook [-h] -u URL [URL ...] -c CONTENT [--username USERNAME]
-                       [--avatar_url AVATAR_URL]
-
-Trigger discord webhook(s).
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -u URL [URL ...], --url URL [URL ...]
-                        Webhook(s) url(s)
-  -c CONTENT, --content CONTENT
-                        Message content
-  --username USERNAME   override the default username of the webhook
-  --avatar_url AVATAR_URL
-                        override the default avatar of the webhook
-```
-
 ### Timeout
 
 ```python
@@ -363,8 +357,7 @@ from discord_webhook import AsyncDiscordWebhook
 
 
 async def send_webhook(message):
-    webhook = AsyncDiscordWebhook(url='your webhook url',
-                                  content=message)
+    webhook = AsyncDiscordWebhook(url='your webhook url', content=message)
     await webhook.execute()
 
 
@@ -377,3 +370,43 @@ async def main():
 
 asyncio.run(main())
 ```
+
+### Use CLI
+
+```
+usage: discord_webhook [-h] -u URL [URL ...] -c CONTENT [--username USERNAME]
+                       [--avatar_url AVATAR_URL]
+
+Trigger discord webhook(s).
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u URL [URL ...], --url URL [URL ...]
+                        Webhook(s) url(s)
+  -c CONTENT, --content CONTENT
+                        Message content
+  --username USERNAME   override the default username of the webhook
+  --avatar_url AVATAR_URL
+                        override the default avatar of the webhook
+```
+
+## Development
+
+### Dev Setup
+This project uses [Poetry](https://python-poetry.org/docs/) for dependency management and packaging.
+
+Install Poetry and add Poetry to [Path](https://python-poetry.org/docs/#installation).
+
+**Debian / Ubuntu / Mac**
+
+`curl -sSL https://install.python-poetry.org | python3 -`
+
+**Windows**
+
+open powershell and run: `(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -`
+
+Install dependencies: `poetry install`
+
+Install the defined pre-commit hooks: `poetry run pre-commit install`
+
+Activate the virtualenv: `poetry shell`
