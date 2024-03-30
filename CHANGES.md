@@ -2,9 +2,30 @@
 
 ## development
 
+## 2024-01-31 1.3.1
+
+### 🩹 Fixes
+- fix typing for allowed_mentions
+
+## 2023-08-14 1.3.0
+
+### 🎉 Features
+- add support for threads
+  - set `thread_id` or `thread_name` as kwargs in `AsyncDiscordWebhook` and `DiscordWebhook`
+
+## 2023-07-29 1.2.1
+
+### 🩹 Fixes
+- `timeout` keyword has accidentally set `tts` as well
+
+## 2023-07-24 1.2.0
+
 ### 🎉 Features
 - `set_timestamp()` accepts also a datetime object
   - set timestamp as ISO 8601
+
+### 🩹 Fixes
+- fix rate limit retry
 
 ## 2023-02-15 1.1.0
 
